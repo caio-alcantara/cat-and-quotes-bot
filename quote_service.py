@@ -13,7 +13,7 @@ class QuoteService:
             r = requests.get(os.getenv("QUOTE_API_URL"), timeout=5)  # Timeout 5
         except requests.exceptions.Timeout:
             return ServiceResponse('Request timed out. Could not retrieve a quote at this time, sorry.', 'requisition timed out error')
-        
+            ## trocar textos por exceptions? 
         if r.status_code != 200:
             return ServiceResponse('I could not retrieve a quote at this time, sorry.', f'status code == HTTP{r.status_code} error')
         
