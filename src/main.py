@@ -5,7 +5,15 @@ from bot_handler import BotHandler
 
 quote_service = QuoteService()
 cat_service = CatService()
-bot_handler = BotHandler(quote_service, cat_service)
+from message_handlers import QuoteHandler, CatHandler
+
+handlers = [
+    QuoteHandler(quote_service),
+    CatHandler(cat_service)
+]
+
+bot_handler = BotHandler(handlers)
+
 
 app = Flask(__name__)
 
