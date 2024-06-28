@@ -1,6 +1,7 @@
 import requests
 import json
 from service_response import ServiceResponse
+from quote import Quote
 import os
 from dotenv import load_dotenv
 
@@ -27,11 +28,4 @@ class QuoteService:
         
         quote = Quote(data['content'], data['author'])
         return ServiceResponse(str(quote), 'text')        
-    
-class Quote:
-    def __init__(self, content, author):
-        self.content = content
-        self.author = author
 
-    def __str__(self):
-        return f'{self.content} ({self.author})'
