@@ -1,5 +1,5 @@
 from twilio.twiml.messaging_response import MessagingResponse
-from bot_handler import BotHandler  # substitua 'bot_handler' pelo nome do módulo onde BotHandler está definido
+from bot_handler import BotHandler 
 import os
 from dotenv import load_dotenv
 
@@ -85,7 +85,7 @@ def test_handle_message_with_both(monkeypatch):
     assert quote_service_called
     assert response == f'<?xml version="1.0" encoding="UTF-8"?><Response><Message><Body>A famous quote (The Author)</Body><Media>{os.getenv("CAT_IMG_URL")}</Media></Message></Response>'
 
-def test_handle_message_with_neiter(monkeypatch):
+def test_handle_message_with_neiter():
     mock_quote_service = MockQuoteService()
     mock_cat_service = MockCatService()
 
@@ -93,17 +93,6 @@ def test_handle_message_with_neiter(monkeypatch):
 
     cat_service_called = []
     quote_service_called = []
-
-    def mock_get_quote_content():
-        quote_service_called.append(True)
-        return MockQuote("A famous quote", 'text')
-
-    def mock_get_cat_content():
-        cat_service_called.append(True)
-        return MockCat(os.getenv("CAT_IMG_URL"), 'media')
-    
-    monkeypatch.setattr(mock_quote_service, 'get_content', mock_get_quote_content)
-    monkeypatch.setattr(mock_cat_service, 'get_content', mock_get_cat_content)
 
     response = bot_handler.handle_message('Unrelated text')
     assert not cat_service_called
