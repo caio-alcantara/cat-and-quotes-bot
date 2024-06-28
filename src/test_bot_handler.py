@@ -96,4 +96,4 @@ def test_handle_message_with_neiter():
     response = bot_handler.handle_message('A message with unrelated text')
     assert not cat_handler_called
     assert not quote_handler_called
-    assert response == '<?xml version="1.0" encoding="UTF-8"?><Response><Message /><Message><Body>I only know about famous quotes and cats, sorry!</Body></Message></Response>'
+    assert response == '<?xml version="1.0" encoding="UTF-8"?><Response><Message><Body>I only know about famous quotes and cats, sorry!</Body></Message></Response>'

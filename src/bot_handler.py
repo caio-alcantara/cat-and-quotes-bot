@@ -16,7 +16,7 @@ class BotHandler:
                 message_added = True
 
         if not message_added:
-            resp.message().body('I only know about famous quotes and cats, sorry!')
+            message.body('I only know about famous quotes and cats, sorry!')
         ##print('resp2', resp)
         return str(resp)
 
