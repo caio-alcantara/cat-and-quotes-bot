@@ -1,10 +1,10 @@
 from twilio.twiml.messaging_response import MessagingResponse
 from bot_handler import BotHandler 
+from message_handlers import QuoteHandler, CatHandler
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
-
 
 class MockQuoteService:
     def get_content(self):
@@ -24,77 +24,76 @@ class MockCat:
         self.content = content
         self.content_type = content_type
 
+quote_service = MockQuoteService()
+cat_service = MockCatService()
+
+handlers = [
+    QuoteHandler(quote_service),
+    CatHandler(cat_service)
+]
+
 def test_handle_message_only_with_quote(monkeypatch):
-    mock_quote_service = MockQuoteService()
-    mock_cat_service = MockCatService()
+    bot_handler = BotHandler(handlers)
 
-    bot_handler = BotHandler(mock_quote_service, mock_cat_service)
+    quote_handler_called = []
+    def mock_quote_handler_handle(self, message):
+        quote_handler_called.append(True)
+        quote = quote_service.get_content()
+        message.body(quote.content)
 
-    quote_service_called = []
+    monkeypatch.setattr(QuoteHandler, 'handle', mock_quote_handler_handle)
 
-    def mock_get_quote_content():
-        quote_service_called.append(True)
-        return MockQuote("A famous quote (The Author)", 'text')
-
-    monkeypatch.setattr(mock_quote_service, 'get_content', mock_get_quote_content)
-
-    response = bot_handler.handle_message("Tell me a quote")
-    assert quote_service_called
+    response = bot_handler.handle_message('A message with a quote')
+    assert quote_handler_called
     assert response == '<?xml version="1.0" encoding="UTF-8"?><Response><Message><Body>A famous quote (The Author)</Body></Message></Response>'
 
 def test_handle_message_only_with_cat(monkeypatch):
-    mock_quote_service = MockQuoteService()
-    mock_cat_service = MockCatService()
+    bot_handler = BotHandler(handlers)
 
-    bot_handler = BotHandler(mock_quote_service, mock_cat_service)
+    cat_handler_called = []
+    def mock_cat_handler_handle(self, message):
+        cat_handler_called.append(True)
+        catUrl = cat_service.get_content()
+        message.body(catUrl.content)
 
-    cat_service_called = []
+    monkeypatch.setattr(CatHandler, 'handle', mock_cat_handler_handle)
 
-    def mock_get_cat_content():
-        cat_service_called.append(True)
-        return MockCat(os.getenv("CAT_IMG_URL"), 'media')
-    
-    monkeypatch.setattr(mock_cat_service, 'get_content', mock_get_cat_content)
+    response = bot_handler.handle_message('A message with a cat')
+    assert cat_handler_called
+    assert response == '<?xml version="1.0" encoding="UTF-8"?><Response><Message><Body>https://cataas.com/cat</Body></Message></Response>'
 
-    response = bot_handler.handle_message('Show me a cat picture')
-    assert cat_service_called
-    assert response == f'<?xml version="1.0" encoding="UTF-8"?><Response><Message><Media>{os.getenv("CAT_IMG_URL")}</Media></Message></Response>'
 
 def test_handle_message_with_both(monkeypatch):
-    mock_quote_service = MockQuoteService()
-    mock_cat_service = MockCatService()
+    bot_handler = BotHandler(handlers)
 
-    bot_handler = BotHandler(mock_quote_service, mock_cat_service)
+    cat_handler_called = []
+    quote_handler_called = []
+    def mock_cat_handler_handle(self, message):
+        cat_handler_called.append(True)
+        catUrl = cat_service.get_content()
+        message.body(catUrl.content)
 
-    cat_service_called = []
-    quote_service_called = []
-
-    def mock_get_quote_content():
-        quote_service_called.append(True)
-        return MockQuote("A famous quote (The Author)", 'text')
-
-    def mock_get_cat_content():
-        cat_service_called.append(True)
-        return MockCat(os.getenv("CAT_IMG_URL"), 'media')
+    def mock_quote_handler_handle(self, message):
+        quote_handler_called.append(True)
+        quote = quote_service.get_content()
+        message.body(quote.content)
     
-    monkeypatch.setattr(mock_quote_service, 'get_content', mock_get_quote_content)
-    monkeypatch.setattr(mock_cat_service, 'get_content', mock_get_cat_content)
+    monkeypatch.setattr(CatHandler, 'handle', mock_cat_handler_handle)
+    monkeypatch.setattr(QuoteHandler, 'handle', mock_quote_handler_handle)
 
-    response = bot_handler.handle_message('Show me a cat and a quote')
-    assert cat_service_called
-    assert quote_service_called
-    assert response == f'<?xml version="1.0" encoding="UTF-8"?><Response><Message><Body>A famous quote (The Author)</Body><Media>{os.getenv("CAT_IMG_URL")}</Media></Message></Response>'
+    response = bot_handler.handle_message('A message with a cat and a quote')
+    assert cat_handler_called
+    assert quote_handler_called
+    assert response == '<?xml version="1.0" encoding="UTF-8"?><Response><Message><Body>A famous quote (The Author)</Body><Body>https://cataas.com/cat</Body></Message></Response>'
+
 
 def test_handle_message_with_neiter():
-    mock_quote_service = MockQuoteService()
-    mock_cat_service = MockCatService()
+    bot_handler = BotHandler(handlers)
 
-    bot_handler = BotHandler(mock_quote_service, mock_cat_service)
+    cat_handler_called = []
+    quote_handler_called = []
 
-    cat_service_called = []
-    quote_service_called = []
-
-    response = bot_handler.handle_message('Unrelated text')
-    assert not cat_service_called
-    assert not quote_service_called
-    assert response == '<?xml version="1.0" encoding="UTF-8"?><Response><Message><Body>I only know about famous quotes and cats, sorry!</Body></Message></Response>'
+    response = bot_handler.handle_message('A message with unrelated text')
+    assert not cat_handler_called
+    assert not quote_handler_called
+    assert response == '<?xml version="1.0" encoding="UTF-8"?><Response><Message /><Message><Body>I only know about famous quotes and cats, sorry!</Body></Message></Response>'

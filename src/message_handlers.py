@@ -1,6 +1,7 @@
 from handler_interface import MessageHandler
 from twilio.twiml.messaging_response import MessagingResponse
 
+
 class QuoteHandler(MessageHandler):
     def __init__(self, quote_service):
         self.quote_service = quote_service
