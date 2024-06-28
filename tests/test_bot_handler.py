@@ -42,8 +42,6 @@ def test_handle_message_only_with_quote(monkeypatch):
     assert quote_service_called
     assert response == '<?xml version="1.0" encoding="UTF-8"?><Response><Message><Body>A famous quote (The Author)</Body></Message></Response>'
 
-
-
 def test_handle_message_only_with_cat(monkeypatch):
     mock_quote_service = MockQuoteService()
     mock_cat_service = MockCatService()

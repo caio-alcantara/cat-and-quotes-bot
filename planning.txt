@@ -1,0 +1,26 @@
+Plano de ação para o dia 28 -> sexta-feira
+
+Tem daily 10h15
+Retro 16h. Vou ficar até às 16h40
+
+terminar toques finais no bot 
+Caso serveo.net não esteja de pé, procurar outras ferramentas de tunneling 
+
+-> Opção de tunneling: ssh -R 80:localhost:4000 nokey@localhost.run
+
+Em termos de código:
+- Trabalhar os erros, criar exceções personalizadas e tratar elas da maneira 
+  que eu achar mais adequado
+- Entender como posso organizar esses arquivos em camadas, seguindo a Clean Arch
+
+Em termos de documentação:
+- Criar um arquivo markdown com informações gerais sobre o mini-projeto
+  - Propósito
+  - Tecnologias utilizadas
+  - Explicação da arquitetura utilizada
+  - Explicação da estrutura de pastas
+  - Explicação de API's externas, com exemplos de requisição (Ex.: Quote API)
+  - Como baixar e rodar o código
+  - Resultados obtidos (aprendizado pessoal para um futuro projeto mais complexo) com o projeto
+
+
